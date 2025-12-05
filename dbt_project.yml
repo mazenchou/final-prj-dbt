@@ -1,0 +1,17 @@
+# dbt_project.yml - MAKE IT SIMPLE
+name: 'final_prj_team'
+version: '1.0.0'
+profile: 'final_prj_team'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# NOTHING ELSE NEEDED

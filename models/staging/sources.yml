@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: raw_data
+    schema: raw_data
+    description: "Raw CSV data loaded from seed files"
+    
+    tables:
+      - name: customer
+        description: "Customer contact and company information"
+        
+      - name: employees
+        description: "Employee records and contact details"
+        
+      - name: employee_privileges
+        description: "Mapping of employees to system privileges"
+        
+      - name: inventory_transaction_types
+        description: "Types of inventory movements"
