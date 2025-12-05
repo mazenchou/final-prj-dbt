@@ -1,0 +1,27 @@
+name: Manual Deployment
+
+on:
+  workflow_dispatch:  # Manual trigger only
+
+jobs:
+  deploy-notification:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deployment Instructions
+      run: |
+        echo "🚀 MANUAL DEPLOYMENT REQUIRED"
+        echo ""
+        echo "To deploy to staging:"
+        echo "1. Pull the branch locally"
+        echo "2. Run: dbt seed --target staging"
+        echo "3. Run: dbt run --target staging"
+        echo "4. Run: dbt test --target staging"
+        echo ""
+        echo "To deploy to production:"
+        echo "1. Ensure all tests pass in staging"
+        echo "2. Merge to main branch"
+        echo "3. Run: dbt run --target prod"
+        echo ""
+        echo "📊 Current branch: ${{ github.ref }}"
+        echo "🔗 Repository: ${{ github.repository }}"
