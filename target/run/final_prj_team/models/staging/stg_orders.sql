@@ -1,0 +1,36 @@
+
+
+  create or replace view `final-prj-480309`.`dbt_dev`.`stg_orders`
+  OPTIONS()
+  as 
+
+SELECT
+  CAST(id AS INT64) as order_id,
+  CAST(employee_id AS INT64) as employee_id,
+  CAST(customer_id AS INT64) as customer_id,
+  PARSE_DATE('%Y-%m-%d', CAST(order_date AS STRING)) as order_date,
+  CASE 
+    WHEN CAST(shipped_date AS STRING) = '' THEN NULL
+    ELSE PARSE_DATE('%Y-%m-%d', CAST(shipped_date AS STRING))
+  END as shipped_date,
+  CAST(shipper_id AS INT64) as shipper_id,
+  TRIM(CAST(ship_name AS STRING)) as ship_name,
+  TRIM(CAST(ship_address AS STRING)) as ship_address,
+  TRIM(CAST(ship_city AS STRING)) as ship_city,
+  TRIM(CAST(ship_state_province AS STRING)) as ship_state_province,
+  TRIM(CAST(ship_zip_postal_code AS STRING)) as ship_zip_code,
+  TRIM(CAST(ship_country_region AS STRING)) as ship_country,
+  CAST(shipping_fee AS FLOAT64) as shipping_fee,
+  CAST(taxes AS FLOAT64) as taxes,
+  TRIM(CAST(payment_type AS STRING)) as payment_type,
+  CASE 
+    WHEN CAST(paid_date AS STRING) = '' THEN NULL
+    ELSE PARSE_DATE('%Y-%m-%d', CAST(paid_date AS STRING))
+  END as paid_date,
+  TRIM(CAST(notes AS STRING)) as notes,
+  CAST(tax_rate AS FLOAT64) as tax_rate,
+  CAST(tax_status_id AS INT64) as tax_status_id,
+  CAST(status_id AS INT64) as status_id,
+  CURRENT_TIMESTAMP() as loaded_at
+FROM `final-prj-480309`.`dbt_dev`.`orders`;
+
