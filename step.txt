@@ -1,0 +1,37 @@
+#first step :
+# Clone the repository
+git clone < >
+cd dbt_project
+
+
+# Create virtual environment
+python -m venv dbt_env
+
+# Activate it
+# Windows:
+dbt_env\Scripts\activate
+
+# Install dbt
+pip install dbt-bigquery
+
+# Method 1: Application Default Credentials (Recommended)
+gcloud auth application-default login
+
+# Method 2: Regular gcloud auth
+gcloud auth login
+
+# Set the project
+gcloud config set project final-prj-480309
+
+#test connection :
+# Test development
+dbt debug --target dev
+
+# Test staging  
+dbt debug --target staging
+
+# Test production
+dbt debug --target prod
+
+# Test raw
+dbt debug --target raw

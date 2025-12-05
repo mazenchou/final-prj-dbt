@@ -1,0 +1,32 @@
+name: dbt CD Pipeline
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+
+jobs:
+  deploy-staging:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup
+      run: |
+        echo 'This will deploy to staging (to be configured later)'
+        echo 'Branch: staging'
+        
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup
+      run: |
+        echo 'This will deploy to production (to be configured later)'
+        echo 'Branch: main'
