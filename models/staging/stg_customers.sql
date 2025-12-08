@@ -6,6 +6,7 @@ SELECT
   company as company_name,
   last_name,
   first_name,
+  city,
   email_address as email,
   job_title,
   CURRENT_TIMESTAMP() as loaded_at
