@@ -20,7 +20,7 @@ select
     state_code,
     zip_code,
     country,
-    web_page,  -- ← Changed from website to web_page
+    web_page, 
     notes,
     attachments,
     full_name,

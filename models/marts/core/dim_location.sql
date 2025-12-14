@@ -1,45 +1,67 @@
 -- models/marts/core/dim_location.sql
-{{ config(materialized='table') }}
+{{ 
+    config(
+        materialized='table',
+        tags=['dimension', 'location']
+    ) 
+}}
+
+WITH customer_locations AS (
+    SELECT DISTINCT
+        TRIM(city) as city,
+        TRIM(state_code) as state_code,
+        TRIM(country) as country
+    FROM {{ ref('stg_customers') }}
+    WHERE city IS NOT NULL 
+      AND state_code IS NOT NULL 
+      AND country IS NOT NULL
+),
+
+employee_locations AS (
+    SELECT DISTINCT
+        TRIM(city) as city,
+        TRIM(state_code) as state_code,
+        TRIM(country) as country
+    FROM {{ ref('stg_employees') }}
+    WHERE city IS NOT NULL 
+      AND state_code IS NOT NULL 
+      AND country IS NOT NULL
+),
+
+supplier_locations AS (
+    SELECT DISTINCT
+        TRIM(city) as city,
+        TRIM(state_code) as state_code,
+        TRIM(country) as country
+    FROM {{ ref('stg_suppliers') }}
+    WHERE city IS NOT NULL 
+      AND state_code IS NOT NULL 
+      AND country IS NOT NULL
+),
+
+all_locations AS (
+    SELECT * FROM customer_locations
+    UNION DISTINCT
+    SELECT * FROM employee_locations
+    UNION DISTINCT
+    SELECT * FROM supplier_locations
+)
 
 SELECT
-  -- Create a unique location ID using available data
-  MD5(CONCAT(
-    COALESCE(city, ''), 
-    '|', 
-    COALESCE(state_code, ''), 
-    '|', 
-    COALESCE(country, '')
-  )) as location_id,
-  city,
-  state_code,
-  country
-FROM (
-  -- Customer locations: only city available
-  SELECT 
-    city,
-    NULL as state_code,  -- Customer doesn't have state_code
-    NULL as country      -- Customer doesn't have country
-  FROM {{ ref('dim_customer') }}
-  WHERE city IS NOT NULL
-  
-  UNION DISTINCT
-  
-  -- Employee locations: full address available
-  SELECT 
-    city,
-    state_code,
-    country
-  FROM {{ ref('dim_employee') }}
-  WHERE city IS NOT NULL
-  
-  UNION DISTINCT
-  
-  -- Supplier locations: full address available
-  SELECT 
-    city,
-    state_code,
-    country
-  FROM {{ ref('dim_supplier') }}
-  WHERE city IS NOT NULL
-) locations
+    -- Consistent location_id across all models
+    MD5(
+        CONCAT(
+            UPPER(TRIM(city)),
+            '|',
+            UPPER(TRIM(state_code)),
+            '|',
+            UPPER(TRIM(country))
+        )
+    ) as location_id,
+    INITCAP(TRIM(city)) as city,
+    UPPER(TRIM(state_code)) as state_code,
+    INITCAP(TRIM(country)) as country,
+    CURRENT_TIMESTAMP() as loaded_at
+FROM all_locations
 WHERE city IS NOT NULL
+ORDER BY country, state_code, city

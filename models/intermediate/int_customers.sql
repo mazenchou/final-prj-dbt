@@ -10,6 +10,10 @@ select
     company_name,
     concat(trim(first_name), ' ', trim(last_name)) as contact_name,
     city,
+    state_code,
+    zip_code,
+    country,
+    web_page,
     email,
     job_title,
     loaded_at  -- Only use columns that actually exist
