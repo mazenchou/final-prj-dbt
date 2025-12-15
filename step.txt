@@ -1,6 +1,6 @@
 #first step :
 # Clone the repository
-git clone < >
+git clone <https://github.com/mazenchou/final-prj-dbt >
 cd dbt_project
 
 
@@ -23,15 +23,107 @@ gcloud auth login
 # Set the project
 gcloud config set project final-prj-480309
 
-#test connection :
-# Test development
-dbt debug --target dev
 
-# Test staging  
-dbt debug --target staging
 
-# Test production
-dbt debug --target prod
+# Open PowerShell/Terminal
+git clone https://github.com/mazenchou/final-prj-dbt.git
+cd final-prj-dbt
 
-# Test raw
-dbt debug --target raw
+# Check you're on dev branch
+git branch
+# Should show: * dev
+
+
+# Create virtual environment
+python -m venv dbt_env
+
+# Activate (Windows)
+dbt_env\Scripts\activate
+
+# Install dbt
+pip install dbt-bigquery
+
+
+
+# Login to Google Cloud
+gcloud auth application-default login
+
+# A browser will open - login with your Google account
+# Select the correct account (company email)
+
+# Set the project
+gcloud config set project final-prj-480309
+
+
+# 3. Copy profiles.yml (already in repo, same for everyone)
+# No changes needed!
+
+# Run dbt debug to check everything works
+dbt debug
+
+# You should see:
+# ✅ All checks passed!
+
+# Only ONE person needs to run this first
+# (You probably already did this)
+
+# If not, run once:
+dbt seed --target dev      # Loads 13 CSV files
+dbt run --target dev       # Builds 12 staging models
+
+
+
+Verify in BigQuery Console:
+Go to: https://console.cloud.google.com/bigquery
+
+Select project: final-prj-480309
+
+Open dataset: dbt_dev
+
+You should see 13 seed tables + 12 staging tables
+
+
+
+
+Daily Workflow:
+4.1 Start Fresh (ALWAYS do this first!)
+
+
+# 1. Go to dev branch
+git checkout dev
+
+# 2. Get latest changes from team
+git pull origin dev
+
+# 3. Check if anyone else is working (optional)
+git log --oneline -5
+
+
+
+4.2 Create Your Feature Branch
+
+
+
+# Format: feature/yourname-what-youre-doing
+git checkout -b feature/john-dim-customers
+# Example: feature/sarah-fct-sales
+# Example: feature/mike-dim-products
+
+#do your works then everyhting done 
+#dim , fact 
+4.3 Work on Your Task
+
+4.4 Test Your Model
+# Build just YOUR model
+dbt run --model dim_customers --target dev
+
+# Check in BigQuery Console:
+# Dataset: dbt_dev
+# Table: dim_customers (should appear)
+
+# Run tests (optional)
+dbt test --model dim_customers --target dev
+
+
+
+
