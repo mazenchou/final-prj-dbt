@@ -13,15 +13,17 @@ SELECT
     email,
     job_title,
     -- Calculate SAME location_id as dim_location
-    MD5(
-        CONCAT(
-            UPPER(TRIM(city)),
-            '|',
-            UPPER(TRIM(state_code)),
-            '|',
-            UPPER(TRIM(country))
+    TO_HEX(
+        MD5(
+            CONCAT(
+                UPPER(TRIM(city)),
+                '|',
+                UPPER(TRIM(state_code)),
+                '|',
+                UPPER(TRIM(country))
+            )
         )
-    ) as location_id,
+    ) as location_id,  -- COMMA ADDED HERE
     loaded_at
 FROM {{ ref('int_customers') }}
 WHERE customer_id IS NOT NULL

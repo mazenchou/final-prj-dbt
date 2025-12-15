@@ -1,24 +1,24 @@
--- models/intermediate/int_orders.sql
+-- models/intermediate/int_orders.sql (ADD DATE IDs)
 {{ config(materialized='view') }}
 
-with orders as (
-    select * from {{ ref('stg_orders') }}
+WITH orders AS (
+    SELECT * FROM {{ ref('stg_orders') }}
 )
 
-select
+SELECT
     order_id,
     employee_id,
     customer_id,
     
-    -- Original dates (keep them)
-    order_date,
-    shipped_date,
-    paid_date,
+    -- Original dates (keep as DATE)
+    DATE(order_date) as order_date,
+    DATE(shipped_date) as shipped_date,
+    DATE(paid_date) as paid_date,
     
-    -- ADD DATE KEYS HERE (new)
-    CAST(FORMAT_DATE('%Y%m%d', order_date) AS INT64) as order_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', shipped_date) AS INT64) as shipped_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', paid_date) AS INT64) as paid_date_id,
+    -- ADD DATE IDs HERE (NEW!)
+    CAST(FORMAT_DATE('%Y%m%d', DATE(order_date)) AS INT64) as order_date_id,
+    CAST(FORMAT_DATE('%Y%m%d', DATE(shipped_date)) AS INT64) as shipped_date_id,
+    CAST(FORMAT_DATE('%Y%m%d', DATE(paid_date)) AS INT64) as paid_date_id,
     
     -- Rest of columns
     shipper_id,
@@ -38,11 +38,12 @@ select
     loaded_at,
     
     -- Business logic
-    date_diff(
-        coalesce(shipped_date, current_date()),
-        order_date,
-        day
+    DATE_DIFF(
+        COALESCE(DATE(shipped_date), CURRENT_DATE()),
+        DATE(order_date),
+        DAY
     ) as days_to_ship
     
-from orders
-where order_id is not null
+FROM orders
+WHERE order_id IS NOT NULL
+  AND order_date IS NOT NULL

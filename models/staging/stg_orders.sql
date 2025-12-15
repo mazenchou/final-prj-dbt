@@ -1,4 +1,4 @@
--- models/staging/stg_orders.sql (FIXED for YYYY/MM/DD)
+-- models/staging/stg_orders.sql (FIXED - no loaded_at)
 {{ config(materialized='view') }}
 
 SELECT
@@ -6,16 +6,17 @@ SELECT
   CAST(employee_id AS INT64) as employee_id,
   CAST(customer_id AS INT64) as customer_id,
   
-  -- Handle YYYY/MM/DD format with slashes
+  -- Parse MM/DD/YYYY HH:MM:SS dates
   CASE 
     WHEN order_date IS NOT NULL AND order_date != ''
-    THEN SAFE.PARSE_DATE('%Y/%m/%d', CAST(order_date AS STRING))
+    THEN SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', CAST(order_date AS STRING))
     ELSE NULL
   END as order_date,
   
+  -- Parse shipped_date (may be empty)
   CASE 
     WHEN shipped_date IS NOT NULL AND shipped_date != ''
-    THEN SAFE.PARSE_DATE('%Y/%m/%d', CAST(shipped_date AS STRING))
+    THEN SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', CAST(shipped_date AS STRING))
     ELSE NULL
   END as shipped_date,
   
@@ -30,9 +31,10 @@ SELECT
   CAST(taxes AS FLOAT64) as taxes,
   TRIM(CAST(payment_type AS STRING)) as payment_type,
   
+  -- Parse paid_date
   CASE 
     WHEN paid_date IS NOT NULL AND paid_date != ''
-    THEN SAFE.PARSE_DATE('%Y/%m/%d', CAST(paid_date AS STRING))
+    THEN SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', CAST(paid_date AS STRING))
     ELSE NULL
   END as paid_date,
   
@@ -40,5 +42,10 @@ SELECT
   CAST(tax_rate AS FLOAT64) as tax_rate,
   CAST(tax_status_id AS INT64) as tax_status_id,
   CAST(status_id AS INT64) as status_id,
+  
+  -- Add loaded_at timestamp (since source doesn't have it)
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('orders') }}  -- Changed from ref('orders') to source('raw', 'orders')
+  
+FROM {{ ref('orders') }}
+WHERE id IS NOT NULL
+  AND customer_id IS NOT NULL
