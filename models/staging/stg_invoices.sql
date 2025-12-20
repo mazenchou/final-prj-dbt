@@ -12,4 +12,5 @@ SELECT
   CAST(shipping AS FLOAT64) as shipping_amount,
   CAST(amount_due AS FLOAT64) as amount_due,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('invoices') }}
+FROM 
+{{ source('raw_data', 'invoices') }}

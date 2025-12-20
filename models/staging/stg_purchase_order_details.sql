@@ -11,4 +11,5 @@ SELECT
   CAST(inventory_id AS INT64) as inventory_id,
   CAST(quantity * unit_cost AS FLOAT64) as total_cost,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('purchase_order_details') }}
+FROM
+{{ source('raw_data', 'purchase_order_details') }}

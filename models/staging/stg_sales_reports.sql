@@ -7,4 +7,5 @@ SELECT
   TRIM(CAST(filter_row_source AS STRING)) as filter_source,
   TRIM(CAST(`default` AS STRING)) as default_setting,  -- ← FIXED: Backticks around default
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('sales_reports') }}
+FROM 
+{{ source('raw_data', 'sales_reports') }}

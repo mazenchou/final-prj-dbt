@@ -27,3 +27,20 @@ final_prj_team:
       dataset: dbt_prod
       location: US  
       threads: 1  
+
+    intermediate:
+      type: bigquery
+      method: oauth
+      project: final-prj-480309
+      dataset: dbt_intermediate
+      location: US
+      threads: 4
+
+    marts:
+      type: bigquery
+      method: oauth
+      project: final-prj-480309
+      dataset: dbt_marts
+      location: US  
+      threads: 4
+    

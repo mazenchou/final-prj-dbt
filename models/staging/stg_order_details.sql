@@ -16,4 +16,6 @@ SELECT
   CAST(inventory_id AS INT64) as inventory_id,
   CAST(unit_price * quantity * (1 - COALESCE(discount, 0)) AS FLOAT64) as net_amount,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('order_details') }}
+FROM {{ source('raw_data', 'order_details') }}{{ config(materialized='view') }}
+
+

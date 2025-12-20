@@ -37,6 +37,3 @@ SELECT
     loaded_at
 FROM {{ ref('int_suppliers') }}
 WHERE supplier_id IS NOT NULL
-  AND city IS NOT NULL
-  AND state_code IS NOT NULL
-  AND country IS NOT NULL

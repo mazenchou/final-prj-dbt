@@ -1,4 +1,4 @@
--- models/staging/stg_purchase_orders.sql (UPDATED FIX)
+-- models/staging/stg_purchase_orders.sql (HANDLES MIXED TYPES)
 {{ config(materialized='view') }}
 
 SELECT
@@ -6,25 +6,42 @@ SELECT
   CAST(supplier_id AS INT64) as supplier_id,
   CAST(created_by AS INT64) as created_by_employee_id,
   
-  -- Handle dates that might come as integers (YYYYMMDD format)
+  -- Handle BOTH string and integer dates
   CASE 
     WHEN submitted_date IS NOT NULL 
-    THEN SAFE.PARSE_DATE('%Y%m%d', SAFE_CAST(submitted_date AS STRING))
-    ELSE NULL 
+    THEN COALESCE(
+      -- Try as STRING first (MM/DD/YYYY HH:MM:SS)
+      SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', 
+        TRIM(SAFE_CAST(submitted_date AS STRING))),
+      -- Try as INTEGER (YYYYMMDD)
+      SAFE.PARSE_TIMESTAMP('%Y%m%d', 
+        CONCAT(SAFE_CAST(submitted_date AS STRING), ' 00:00:00'))
+    )
+    ELSE NULL
   END as submitted_date,
   
   CASE 
     WHEN creation_date IS NOT NULL 
-    THEN SAFE.PARSE_DATE('%Y%m%d', SAFE_CAST(creation_date AS STRING))
-    ELSE NULL 
+    THEN COALESCE(
+      SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', 
+        TRIM(SAFE_CAST(creation_date AS STRING))),
+      SAFE.PARSE_TIMESTAMP('%Y%m%d', 
+        CONCAT(SAFE_CAST(creation_date AS STRING), ' 00:00:00'))
+    )
+    ELSE NULL
   END as creation_date,
   
   CAST(status_id AS INT64) as status_id,
   
   CASE 
     WHEN expected_date IS NOT NULL 
-    THEN SAFE.PARSE_DATE('%Y%m%d', SAFE_CAST(expected_date AS STRING))
-    ELSE NULL 
+    THEN COALESCE(
+      SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', 
+        TRIM(SAFE_CAST(expected_date AS STRING))),
+      SAFE.PARSE_TIMESTAMP('%Y%m%d', 
+        CONCAT(SAFE_CAST(expected_date AS STRING), ' 00:00:00'))
+    )
+    ELSE NULL
   END as expected_date,
   
   SAFE_CAST(shipping_fee AS NUMERIC) as shipping_fee,
@@ -32,7 +49,12 @@ SELECT
   
   CASE 
     WHEN payment_date IS NOT NULL 
-    THEN SAFE.PARSE_DATE('%Y%m%d', SAFE_CAST(payment_date AS STRING))
+    THEN COALESCE(
+      SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', 
+        TRIM(SAFE_CAST(payment_date AS STRING))),
+      SAFE.PARSE_TIMESTAMP('%Y%m%d', 
+        CONCAT(SAFE_CAST(payment_date AS STRING), ' 00:00:00'))
+    )
     ELSE NULL 
   END as payment_date,
   
@@ -43,10 +65,15 @@ SELECT
   
   CASE 
     WHEN approved_date IS NOT NULL 
-    THEN SAFE.PARSE_DATE('%Y%m%d', SAFE_CAST(approved_date AS STRING))
+    THEN COALESCE(
+      SAFE.PARSE_TIMESTAMP('%m/%d/%Y %H:%M:%S', 
+        TRIM(SAFE_CAST(approved_date AS STRING))),
+      SAFE.PARSE_TIMESTAMP('%Y%m%d', 
+        CONCAT(SAFE_CAST(approved_date AS STRING), ' 00:00:00'))
+    )
     ELSE NULL 
   END as approved_date,
   
   CAST(submitted_by AS INT64) as submitted_by_employee_id,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('purchase_orders') }}
+FROM {{ source('raw_data', 'purchase_orders') }}

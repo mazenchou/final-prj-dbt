@@ -21,4 +21,4 @@ SELECT
   attachments,
   CONCAT(TRIM(CAST(first_name AS STRING)), ' ', TRIM(CAST(last_name AS STRING))) as full_name,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('employees') }}
+FROM {{ source('raw_data', 'employees') }}
