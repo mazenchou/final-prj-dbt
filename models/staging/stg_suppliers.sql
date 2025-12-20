@@ -22,4 +22,5 @@ SELECT
   TRIM(CAST(attachments AS STRING)) as attachments,
   CONCAT(TRIM(CAST(first_name AS STRING)), ' ', TRIM(CAST(last_name AS STRING))) as contact_full_name,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('suppliers') }}
+FROM 
+{{ source('raw_data', 'suppliers') }}

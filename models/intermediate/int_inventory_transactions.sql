@@ -1,21 +1,18 @@
--- models/intermediate/int_inventory_transactions.sql
+-- models/intermediate/int_inventory_transactions.sql (FIXED)
 {{ config(materialized='view') }}
 
-with inventory_transactions as (
-    select * from {{ ref('stg_inventory_transactions') }}
-)
-
-select
+SELECT
     inventory_transaction_id,
     transaction_type_id,
     
-    -- Original dates (keep them)
+    -- Keep as DATETIME/TIMESTAMP
     transaction_created_at,
     transaction_modified_at,
     
-    -- ADD DATE KEYS HERE
-    CAST(FORMAT_DATE('%Y%m%d', DATE(transaction_created_at)) AS INT64) as transaction_created_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', DATE(transaction_modified_at)) AS INT64) as transaction_modified_date_id,
+    -- NO DATE ID CALCULATION HERE!
+    -- Just convert to DATE if needed for joins
+    DATE(transaction_created_at) as transaction_created_date,
+    DATE(transaction_modified_at) as transaction_modified_date,
     
     product_id,
     quantity,
@@ -24,5 +21,5 @@ select
     comments,
     loaded_at
     
-from inventory_transactions
-where inventory_transaction_id is not null
+FROM {{ ref('stg_inventory_transactions') }}
+WHERE inventory_transaction_id IS NOT NULL

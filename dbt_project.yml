@@ -15,3 +15,25 @@ clean-targets:
   - "dbt_packages"
 
 
+# SIMPLE CONFIGURATION
+models:
+  final_prj_team:
+    
+    # STAGING models go to dbt_staging dataset
+    staging:
+      +schema: staging
+      +database: final-prj-480309
+      +tags: staging
+      
+    # INTERMEDIATE models go to dbt_intermediate dataset  
+    intermediate:
+      +schema: intermediate
+      +database: final-prj-480309
+      +tags: intermediate
+      
+    # MART models (ALL dimensions and facts) go to dbt_marts dataset
+    marts:
+      +schema: marts
+      +database: final-prj-480309
+      +tags: marts
+      

@@ -15,11 +15,7 @@ SELECT
     DATE(shipped_date) as shipped_date,
     DATE(paid_date) as paid_date,
     
-    -- ADD DATE IDs HERE (NEW!)
-    CAST(FORMAT_DATE('%Y%m%d', DATE(order_date)) AS INT64) as order_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', DATE(shipped_date)) AS INT64) as shipped_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', DATE(paid_date)) AS INT64) as paid_date_id,
-    
+
     -- Rest of columns
     shipper_id,
     ship_name,

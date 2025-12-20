@@ -14,7 +14,7 @@ WITH customer_base AS (
     web_page,
     email_address as email,
     job_title
-  FROM {{ ref('customer') }}
+  FROM {{ source('raw_data', 'customer') }}
 ),
 ranked_customers AS (
   SELECT

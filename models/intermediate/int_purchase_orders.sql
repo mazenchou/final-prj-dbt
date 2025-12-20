@@ -1,30 +1,22 @@
--- models/intermediate/int_purchase_orders.sql
+-- models/intermediate/int_purchase_orders.sql (FIXED - NO DATE IDs)
 {{ config(materialized='view') }}
 
-with purchase_orders as (
-    select * from {{ ref('stg_purchase_orders') }}
+WITH purchase_orders AS (
+    SELECT * FROM {{ ref('stg_purchase_orders') }}
 )
 
-select
+SELECT
     purchase_order_id,
     supplier_id,
     created_by_employee_id,
     
-    -- Original dates (keep them)
-    submitted_date,
-    creation_date,
-    expected_date,
-    payment_date,
-    approved_date,
-    
-    -- ADD DATE KEYS HERE (new)
-    CAST(FORMAT_DATE('%Y%m%d', submitted_date) AS INT64) as submitted_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', creation_date) AS INT64) as creation_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', expected_date) AS INT64) as expected_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', payment_date) AS INT64) as payment_date_id,
-    CAST(FORMAT_DATE('%Y%m%d', approved_date) AS INT64) as approved_date_id,
-    
-    -- Rest of columns
+    -- Convert TIMESTAMP to DATE
+    DATE(submitted_date) as submitted_date,
+    DATE(creation_date) as creation_date,
+    DATE(expected_date) as expected_date,
+    DATE(payment_date) as payment_date,
+    DATE(approved_date) as approved_date,
+    -- Rest of columns (unchanged)
     status_id,
     shipping_fee,
     taxes,

@@ -46,6 +46,6 @@ SELECT
   -- Add loaded_at timestamp (since source doesn't have it)
   CURRENT_TIMESTAMP() as loaded_at
   
-FROM {{ ref('orders') }}
+FROM {{ source('raw_data', 'orders') }}
 WHERE id IS NOT NULL
   AND customer_id IS NOT NULL

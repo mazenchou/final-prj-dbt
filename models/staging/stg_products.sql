@@ -20,4 +20,4 @@ SELECT
     ELSE 'Active'
   END as product_status,
   CURRENT_TIMESTAMP() as loaded_at
-FROM {{ ref('products') }}
+FROM {{ source('raw_data', 'products') }}
